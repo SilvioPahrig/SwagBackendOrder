@@ -9,11 +9,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.AdditionalInformation', {
 
     alias: 'widget.createbackendorder-additional',
 
-    flex: 1,
+    flex: 2,
 
     layout: 'hbox',
 
-    margin: '15 10 0 5',
+    margin: '10 10 0 5',
 
     overflowY: 'auto',
 

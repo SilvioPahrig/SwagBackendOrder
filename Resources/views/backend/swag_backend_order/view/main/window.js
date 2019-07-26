@@ -150,15 +150,28 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.Window', {
             name: 'middle-container',
             items: [
                 me.createShippingInformationPanel(),
+                me.getPaymentPanel(),
                 me.createAdditionalInformationPanel()
             ],
             defaults: {
-                height: 175
+                height: 70
             },
             layout: {
                 type: 'hbox',
                 align: 'stretch'
             }
+        });
+    },
+    /**
+     * creates the payment panel
+     *
+     * @returns { Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Payment }
+     */
+    getPaymentPanel: function () {
+        var me = this;
+
+        return Ext.create('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Payment', {
+            subApplication: me.subApplication
         });
     },
 

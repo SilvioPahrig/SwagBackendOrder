@@ -20,7 +20,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.list.Positions', {
     flex: 1,
 
     defaults: {
-        height: 260
+        height: 240
     },
 
     autoScroll: true,

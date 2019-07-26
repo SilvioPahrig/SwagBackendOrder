@@ -1,4 +1,5 @@
 //
+//{namespace name=backend/swag_backend_order/view/customer_information}
 //{block name="backend/create_backend_order/view/customer_information/billing"}
 //
 Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Billing', {
@@ -15,18 +16,22 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Billing
      */
     alternateClassName: 'SwagBackendOrder.view.main.CustomerInformation.Billing',
 
-    bodyPadding: 10,
+    bodyPadding: 0,
 
     flex: 1,
 
     autoScroll: true,
 
     snippets: {
-        title: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/billing/title"}Billing address{/s}',
+        title: '{s name="swag_backend_order/customer_information/billing/title"}Billing address{/s}',
         salutation: {
-            mister: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/salutation/mister"}Mr{/s}',
-            miss: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/salutation/miss"}Ms{/s}'
-        }
+            mister: '{s name="swag_backend_order/customer_information/salutation/mister"}Mr{/s}',
+            miss: '{s name="swag_backend_order/customer_information/salutation/miss"}Ms{/s}',
+            salutation: '{s name="salutation"}Salutation{/s}'
+        },
+        firstname: '{s name="firstname"}Firstname{/s}',
+        lastname: '{s name="lastname"}Lastname{/s}',
+        checkBoxNewBillingAddress: '{s name=checkBoxNewBillingAddress}Other address{/s}',
     },
 
     paddingRight: 5,
@@ -100,16 +105,129 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Billing
                         tpl: me.createBillingTemplate(),
                         layout: 'fit'
                     });
-
-                    me.remove('billingDataView', true);
-                    me.add(me.dataView);
-                    me.doLayout();
+                    
+                    me.billingPanelLeft.remove('billingDataView', true);
+                    me.billingPanelLeft.add(me.dataView);
+                    me.billingPanelLeft.doLayout();
 
                 }
             }
         });
 
-        return [me.billingAddressComboBox];
+        me.billingPanelLeft = Ext.create('Ext.panel.Panel', {
+            flex: 1,
+            items: me.billingAddressComboBox,
+            border: false,
+        });
+
+        me.billingPanleRight = Ext.create('Ext.panel.Panel', {
+            flex: 2,
+            items: me.getAdditionalBillingAddressForm(),
+            border: false,
+            padding: '0 0 0 30',
+            layout: {
+                type: 'vbox',
+                align: 'stretch',
+            },
+            defaults: {
+                anchor: '95%',
+                labelWidth: 95,
+                hidden: true,
+                listeners: {
+                    change: function (el, newValue, oldValue) {
+                        me.fireEvent('changeAdditionalBilling', el, newValue);
+                    }
+                }
+            }
+        });
+
+        return me.billingPanle = [{
+            xtype: 'panel',
+            border: false,
+            bodyPadding: 10,
+            defaults: {
+                anchor: '100%'
+            },
+            layout: {
+                type: 'hbox',
+                align: 'stretch'
+            },
+            items: [
+                me.billingPanelLeft,
+                me.billingPanleRight
+            ]
+        }];
+    },
+
+    getAdditionalBillingAddressForm: function () {
+        var me = this;
+        return me.AdditionalBillingAddressForm = [
+            {
+                xtype: 'checkbox',
+                boxLabel: me.snippets.checkBoxNewBillingAddress,
+                name: 'newBillingAddressValues',
+                inputValue: true,
+                uncheckedValue: false,
+                labelWidth: 100,
+                hidden: false,
+                listeners: {
+                    change: me.onChangeNewBillingAddressValues,
+                    scope: me
+                }
+            },
+            {
+                xtype: 'combobox',
+                fieldLabel: me.snippets.salutation.salutation,
+                valueField: 'value',
+                displayField: 'label',
+                name: 'salutation',
+                store: Ext.create('Shopware.apps.Base.store.Salutation').load(),
+                listeners: {
+                    select: function (el, record) {
+                        me.fireEvent('changeAdditionalBilling', el, record[0].data.id);
+                    },
+                    scope: me
+                },
+                allowBlank: false,
+            },
+            {
+                xtype: 'textfield',
+                name: 'lastName',
+                fieldLabel: me.snippets.lastname,
+                allowBlank: false,
+            },
+            {
+                xtype: 'textfield',
+                name: 'firstName',
+                fieldLabel: me.snippets.firstname,
+                allowBlank: false,
+            }
+        ];
+    },
+
+    onChangeNewBillingAddressValues: function (el, newValue) {
+        var me = this;
+
+        if (newValue === true) {
+            me.showNewBillingForm()
+        } else {
+            me.hiddeNewBillingForm()
+        }
+        me.fireEvent('changeAdditionalBilling', el, newValue);
+    },
+
+    showNewBillingForm: function () {
+        var me = this;
+        me.billingPanleRight.items.items[1].show();
+        me.billingPanleRight.items.items[2].show();
+        me.billingPanleRight.items.items[3].show();
+    },
+
+    hiddeNewBillingForm: function () {
+        var me = this;
+        me.billingPanleRight.items.items[1].hide();
+        me.billingPanleRight.items.items[2].hide();
+        me.billingPanleRight.items.items[3].hide();
     },
 
     /**

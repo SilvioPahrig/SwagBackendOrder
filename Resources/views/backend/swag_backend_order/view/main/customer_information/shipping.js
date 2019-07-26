@@ -1,4 +1,5 @@
 //
+// {namespace name="backend/swag_backend_order/view/customer_information"}
 //{block name="backend/create_backend_order/view/customer_information/shipping"}
 //
 Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shipping', {
@@ -11,18 +12,39 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
 
     bodyPadding: 10,
 
-    flex: 1,
+    flex: 2,
 
     autoScroll: true,
 
     paddingRight: 5,
 
     snippets: {
-        title: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/shipping/title"}Payment{/s}',
-        billingAsShipping: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/shipping/billing_as_shipping"}Use billing address{/s}',
+        title: '{s name="swag_backend_order/customer_information/shipping/title"}Payment{/s}',
+        billingAsShipping: '{s name="swag_backend_order/customer_information/shipping/billing_as_shipping"}Use billing address{/s}',
         salutation: {
-            mister: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/salutation/mister"}Mr{/s}',
-            miss: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/salutation/miss"}Ms{/s}'
+            mister: '{s name="swag_backend_order/customer_information/salutation/mister"}Mr{/s}',
+            miss: '{s name="swag_backend_order/customer_information/salutation/miss"}Ms{/s}'
+        },
+        fields: {
+            salutation: {
+                label: '{s name=salutation}Salutation{/s}'
+            },
+            firstname: '{s name=firstname}Firstname{/s}',
+            title: '{s name=title}Title{/s}',
+            lastname: '{s name=lastname}Lastname{/s}',
+            street: '{s name=street}Street{/s}',
+            zipcode: '{s name=zipcode}Zip code{/s}',
+            city: '{s name=city}City{/s}',
+            additionalAddressLine1: '{s name=additionalAddressLine1}Additional address line 1{/s}',
+            country: '{s name=country}Country{/s}',
+            state: '{s name=state}State{/s}',
+            company: '{s name=company}Company{/s}',
+            department: '{s name=department}Department{/s}',
+            billingAsShipping: {
+                billing: '{s name=selectionBilling}same like billing{/s}',
+                shipping: '{s name=selectionShipping}select shipping{/s}',
+                other: '{s name=selectionOther}other address{/s}'
+            }
         }
     },
 
@@ -46,16 +68,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
 
         me.items = me.createShippingContainer();
 
-        me.billingAsShippingCheckbox.on('change', function () {
-            if (me.billingAsShippingCheckbox.getValue()) {
-                me.shippingAddressComboBox.setValue('');
-                me.remove('shippingDataView', true);
-                me.doLayout();
-
-                me.fireEvent('selectBillingAsShippingAddress');
-            }
-        });
-
         me.callParent(arguments);
     },
 
@@ -68,9 +80,64 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
     createShippingContainer: function () {
         var me = this;
 
+        me.sippingPanelLeft = Ext.create('Ext.panel.Panel', {
+            flex: 1,
+            items: me.createShippingItems(),
+            border: false,
+        });
+
+        me.shippingPanleMiddel = Ext.create('Ext.panel.Panel', {
+            flex: 2,
+            items: me.getAddressFieldsColumn1(),
+            border: false,
+            padding: '0 30 0 10',
+            hidden: true,
+            layout: {
+                type: 'vbox',
+                align: 'stretch',
+            },
+            defaults: {
+                xtype: 'textfield',
+                labelWidth: 155,
+                anchor: '95%',
+                listeners: {
+                    change: function (el, newValue, oldValue) {
+                        me.fireEvent('changeAdditionalShipping', el, newValue);
+                    }
+                }
+            }
+        });
+
+        me.shippingPanleRight = Ext.create('Ext.panel.Panel', {
+            flex: 2,
+            items: me.getAddressFieldsColumn2(),
+            border: false,
+            padding: '0 30 0 0',
+            hidden: true,
+            layout: {
+                type: 'vbox',
+                align: 'stretch'
+            },
+            defaults: {
+                xtype: 'textfield',
+                labelWidth: 155,
+                anchor: '95%',
+                listeners: {
+                    change: function (el, newValue, oldValue) {
+                        me.fireEvent('changeAdditionalShipping', el, newValue);
+                    }
+                }
+            }
+        });
+
+
         return Ext.create('Ext.container.Container', {
             layout: 'hbox',
-            items: me.createShippingItems()
+            items: [
+                me.sippingPanelLeft,
+                me.shippingPanleMiddel,
+                me.shippingPanleRight
+            ]
         });
     },
 
@@ -103,8 +170,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
                         return;
                     }
 
-                    me.billingAsShippingCheckbox.setValue(false);
-
                     var shippingAddressTemplateStore = Ext.create('Ext.data.Store', {
                         model: 'Shopware.apps.SwagBackendOrder.model.Address',
                         data: record.data
@@ -126,28 +191,168 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
             }
         });
 
-        me.billingAsShippingCheckbox = Ext.create('Ext.form.field.Checkbox', {
+        me.billingAsShippingCheckbox = Ext.create('Ext.form.field.ComboBox', {
             flex: 1,
             boxLabel: me.snippets.billingAsShipping,
             name: 'billingAsShipping',
             id: 'billingAsShippingCheckBox',
-            inputValue: true,
-            uncheckedValue: false,
-            checked: true,
-            height: 35,
+            valueField: 'value',
+            displayField: 'label',
+            store: new Ext.data.Store({
+                fields: ['value', 'label'],
+                data: [
+                    { value: 'billing', label: me.snippets.fields.billingAsShipping.billing },
+                    { value: 'shipping', label: me.snippets.fields.billingAsShipping.shipping },
+                    { value: 'other', label: me.snippets.fields.billingAsShipping.other }
+                ]
+            }),
             listeners: {
-                change: function (field, value) {
-                    if (value) {
-                        me.shippingAddressComboBox.disable();
-                    } else {
-                        me.shippingAddressComboBox.enable();
-                        me.shippingAddressComboBox.setValue(me.shippingStore.getAt(0).get(me.shippingAddressComboBox.valueField));
-                    }
-                }
+                select: me.onSelectBillingAsShipping,
+                scope: me
             }
         });
 
-        return [me.shippingAddressComboBox, me.billingAsShippingCheckbox];
+        me.billingAsShippingCheckbox.select('billing');
+
+        return [me.billingAsShippingCheckbox, me.shippingAddressComboBox];
+    },
+
+    getAddressFieldsColumn1: function () {
+        var me = this;
+        return [
+            {
+                xtype: 'combobox',
+                name: 'salutation',
+                triggerAction: 'all',
+                fieldLabel: me.snippets.fields.salutation.label,
+                editable: false,
+                allowBlank: false,
+                valueField: 'key',
+                displayField: 'label',
+                store: Ext.create('Shopware.apps.Base.store.Salutation').load(),
+                listeners: {
+                    select: function (el, record) {
+                        me.fireEvent('changeAdditionalBilling', el, record[0].data.id);
+                    },
+                    scope: me
+                }
+            },
+            {
+                name: 'firstname',
+                allowBlank: false,
+                fieldLabel: me.snippets.fields.firstname,
+
+            },
+            {
+                name: 'lastname',
+                allowBlank: false,
+                fieldLabel: me.snippets.fields.lastname,
+
+            },
+            {
+                name: 'street',
+                allowBlank: false,
+                fieldLabel: me.snippets.fields.street,
+
+            }
+        ];
+    },
+
+    getAddressFieldsColumn2: function () {
+        var me = this;
+        return [
+            {
+                name: 'zipcode',
+                allowBlank: false,
+                fieldLabel: me.snippets.fields.zipcode,
+
+            },
+            {
+                name: 'city',
+                fieldLabel: me.snippets.fields.city,
+                pageSize: 25,
+                allowBlank: false,
+            },
+            {
+                name: 'country',
+                allowBlank: false,
+                fieldLabel: me.snippets.fields.country,
+                pageSize: 25,
+                listeners: {
+                    select: function (el, record) {
+                        me.fireEvent('changeAdditionalBilling', el, record[0].data.id);
+                    },
+                    scope: me
+                },
+                store: me.getCountryStore(),
+                xtype: 'pagingcombobox',
+                valueField:'id',
+                displayField: 'name'
+            },
+            {
+                /* {if {config name=showAdditionAddressLine1} && {config name=requireAdditionAddressLine1}} */
+                allowBlank: false,
+                /* {/if} */
+                name: 'additionalAddressLine1',
+                fieldLabel: me.snippets.fields.additionalAddressLine1,
+            },
+            {
+                name: 'company',
+                fieldLabel: me.snippets.fields.company,
+
+            },
+        ];
+    },
+
+    onSelectBillingAsShipping: function (field, selectRecords) {
+        var value = selectRecords[0].getData().value,
+            me = this;
+        me.fireEvent('selectBillingAsShippingAddress');
+
+        if (value === 'billing') {
+            me.disableShippingAddressComboBox();
+            me.disableOtherAddressForm();
+        } else if (value === 'shipping') {
+            me.disableOtherAddressForm();
+            me.shippingAddressComboBox.enable();
+            me.shippingAddressComboBox.setValue(me.shippingStore.getAt(0).get(me.shippingAddressComboBox.valueField));
+        } else if (value === 'other') {
+            me.disableShippingAddressComboBox();
+            me.shippingPanleRight.show();
+            me.shippingPanleMiddel.show();
+        }
+    },
+
+    disableOtherAddressForm: function () {
+        var me = this;
+        me.shippingPanleRight.hide();
+        me.shippingPanleMiddel.hide();
+    },
+
+    disableShippingAddressComboBox: function () {
+        var me = this;
+        me.shippingAddressComboBox.disable();
+
+        me.shippingAddressComboBox.setValue('');
+        me.remove('shippingDataView', true);
+        me.doLayout();
+    },
+
+    getCountryStore: function() {
+        var selectionFactory = Ext.create('Shopware.attribute.SelectionFactory', {});
+        var store = selectionFactory.createEntitySearchStore("Shopware\\Models\\Country\\Country");
+        store.pageSize = 999;
+
+        store.sort([{
+            property: 'active',
+            direction: 'DESC'
+        }, {
+            property: 'name',
+            direction: 'ASC'
+        }]);
+        store.remoteSort = true;
+
+        return store;
     },
 
     createShippingAddressComboTpl: function () {

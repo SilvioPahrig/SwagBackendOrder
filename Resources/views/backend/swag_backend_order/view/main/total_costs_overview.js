@@ -20,8 +20,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.TotalCostsOverview', {
 
     id: 'totalCostsContainer',
 
-    flex: 1.2,
-
     autoScroll: true,
 
     padding: '5 10 0 10',

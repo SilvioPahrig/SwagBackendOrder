@@ -15,7 +15,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Custome
 
     height: 200,
 
-    flex: 2,
+    flex: 3.8,
 
     //default margin is 0 5 0 0, so we need only a padding of 5 instead of 10
     padding: '10 5 0 10',
@@ -35,8 +35,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Custome
 
         me.items = [
             me.getBillingPanel(),
-            me.getShippingPanel(),
-            me.getPaymentPanel()
+            me.getShippingPanel()
         ];
 
         me.callParent(arguments);
@@ -64,19 +63,6 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Custome
         var me = this;
 
         return Ext.create('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shipping', {
-            subApplication: me.subApplication
-        });
-    },
-
-    /**
-     * creates the payment panel
-     *
-     * @returns { Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Payment }
-     */
-    getPaymentPanel: function () {
-        var me = this;
-
-        return Ext.create('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Payment', {
             subApplication: me.subApplication
         });
     }

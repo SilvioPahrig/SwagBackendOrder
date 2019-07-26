@@ -9,11 +9,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
 
     alias: 'widget.createbackendorder-shippingcosts',
 
-    flex: 1,
+    flex: 2,
 
     layout: 'hbox',
 
-    margin: '15 0 0 10',
+    margin: '10 0 0 10',
 
     autoScroll: true,
 

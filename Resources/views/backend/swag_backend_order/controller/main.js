@@ -31,7 +31,9 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             instanceText: '{s name="swagbackendorder/error/instanceText"}{/s}',
             instanceTitle: '{s name="swagbackendorder/error/instanceTitle"}{/s}',
             title: '{s name="swagbackendorder/error/title"}{/s}',
-            mailTitle: '{s name="swagbackendorder/error/mail_title"}{/s}'
+            mailTitle: '{s name="swagbackendorder/error/mail_title"}{/s}',
+            newBillingAddress: '{s name="swagbackendorder/error/newBillingAddress"}{/s}',
+            billingAsShipping: '{s name="swagbackendorder/error/billingAsShipping"}{/s}'
         },
         success: {
             text: '{s name="swagbackendorder/success/text"}{/s}',
@@ -79,12 +81,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
         me.control({
             'createbackendorder-customer-billing': {
-                selectBillingAddress: me.onSelectBillingAddress
+                selectBillingAddress: me.onSelectBillingAddress,
+                changeAdditionalBilling: me.changeAdditionalBilling
             },
             'createbackendorder-customer-shipping': {
                 selectShippingAddress: me.onSelectShippingAddress,
                 selectBillingAsShippingAddress: me.onSelectBillingAsShippingAddress,
-                calculateBasket: me.onCalculateBasket
+                calculateBasket: me.onCalculateBasket,
+                changeAdditionalShipping: me.changeAdditionalShipping
             },
             'createbackendorder-customer-payment': {
                 selectPayment: me.onSelectPayment
@@ -137,6 +141,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
          */
         me.orderModel = Ext.create('Shopware.apps.SwagBackendOrder.model.CreateBackendOrder', {});
         me.orderAttributeModel = Ext.create('Shopware.apps.SwagBackendOrder.model.OrderAttribute', {});
+        me.additionaShippingModel = Ext.create('Shopware.apps.SwagBackendOrder.model.AdditionalShippingAddress', {});
+        me.additionaBillingModel = Ext.create('Shopware.apps.SwagBackendOrder.model.AdditionalBillingAddress', {});
         me.createBackendOrderStore = me.subApplication.getStore('CreateBackendOrder');
         me.orderModel.set('currencyFactor', 1);
 
@@ -160,6 +166,18 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         }).show();
 
         me.callParent(arguments);
+    },
+
+    changeAdditionalShipping: function (el, value) {
+        var me = this,
+            name = el.getName();
+        me.additionaShippingModel.set(name, value);
+    },
+
+    changeAdditionalBilling: function (el, value) {
+        var me = this,
+            name = el.getName();
+        me.additionaBillingModel.set(name, value);
     },
 
     /**
@@ -268,6 +286,31 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             errmsg += me.snippets.error.positions + '<br>';
         }
 
+
+        if( me.additionaBillingModel.get('newBillingAddressValues') === true) {
+            if (me.additionaBillingModel.get('salutation') === '' ||
+                me.additionaBillingModel.get('lastName') === '' ||
+                me.additionaBillingModel.get('firstName') === ''
+            ) {
+                errmsg += me.snippets.error.newBillingAddress + '<br>';
+            }
+        }
+
+        if( me.additionaShippingModel.get('billingAsShippingCheckBox') === 'other') {
+            if (me.additionaShippingModel.get('salutation') === '' ||
+                me.additionaShippingModel.get('firstname') === '' ||
+                me.additionaShippingModel.get('lastName') === '' ||
+                me.additionaShippingModel.get('street') === '' ||
+                me.additionaShippingModel.get('zipcode') === '' ||
+                me.additionaShippingModel.get('city') === '' ||
+                me.additionaShippingModel.get('country') === '' ||
+                me.additionaShippingModel.get('additionalAddressLine1') === '' ||
+                me.additionaShippingModel.get('company') === ''
+            ) {
+                errmsg += me.snippets.error.billingAsShipping + '<br>';
+            }
+        }
+
         if (errmsg.length > 0) {
             me.window.enable(true);
             Shopware.Notification.createGrowlMessage(me.snippets.error.title, errmsg);
@@ -289,6 +332,12 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
 
         var orderAttributeStore = me.orderModel.orderAttribute();
         orderAttributeStore.add(me.orderAttributeModel);
+
+        var additionalBillingAddressStore = me.orderModel.additionalBillingAddress();
+        additionalBillingAddressStore.add(me.additionaBillingModel);
+
+        var additionalShippingAddressStore = me.orderModel.additionalShippingAddress();
+        additionalShippingAddressStore.add(me.additionaShippingModel);
 
         /**
          * sends the request to the php controller

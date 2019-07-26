@@ -17,11 +17,13 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Payment
 
     bodyPadding: 10,
 
+    margin: '10 0 0 5',
+
     flex: 1,
 
     autoScroll: true,
 
-    paddingRight: 5,
+    // paddingRight: 5,
 
     snippets: {
         title: '{s namespace="backend/swag_backend_order/view/customer_information" name="swag_backend_order/customer_information/payment/title"}{/s}',
