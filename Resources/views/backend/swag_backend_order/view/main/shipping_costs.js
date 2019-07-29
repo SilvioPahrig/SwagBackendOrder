@@ -22,7 +22,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
         fields: {
             art: '{s namespace="backend/swag_backend_order/view/shipping_costs" name="swagbackendorder/shipping_costs/fields/art"}Shipping art{/s}',
             costs: '{s namespace="backend/swag_backend_order/view/shipping_costs" name="swagbackendorder/shipping_costs/fields/costs"}Shipping costs{/s}',
-            costsNet: '{s namespace="backend/swag_backend_order/view/shipping_costs" name="swagbackendorder/shipping_costs/fields/costs_net"}Shipping costs net{/s}'
+            costsNet: '{s namespace="backend/swag_backend_order/view/shipping_costs" name="swagbackendorder/shipping_costs/fields/costs_net"}Shipping costs net{/s}',
+            shippingDate: '{s namespace="backend/swag_backend_order/view/shipping_costs" name="swagbackendorder/shipping_costs/fields/shipping_date"}Shipping date{/s}'
         },
         error: {
             title: '{s namespace="backend/swag_backend_order/view/shipping_costs" name="error/title"}{/s}',
@@ -115,11 +116,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
         });
 
         shippingDate = Ext.create('Ext.form.field.Date', {
-            fieldLabel: 'lieferdatum',
+            fieldLabel: me.snippets.fields.shippingDate,
             width: 250,
             submitFormat: 'd.m.Y',
             name: 'shippingDate',
-            minValue: new Date(),
+            minValue: new Date(new Date().setDate(new Date().getDate() + 1)),
             listeners: {
                 select: function (el, value, eOpts) {
                     me.fireEvent('addShippingDate', value);
