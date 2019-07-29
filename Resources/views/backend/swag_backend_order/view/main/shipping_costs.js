@@ -76,7 +76,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
      */
     createShippingCostsContainerLeft: function () {
         var me = this,
-            shippingArt, shippingCosts, shippingCostsNet, shippingFieldsArray;
+            shippingArt, shippingCosts, shippingCostsNet, shippingFieldsArray, shippingDate;
 
         shippingArt = Ext.create('Ext.form.field.ComboBox', {
             name: 'shipping',
@@ -114,15 +114,32 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.ShippingCosts', {
             }
         });
 
+        shippingDate = Ext.create('Ext.form.field.Date', {
+            fieldLabel: 'lieferdatum',
+            width: 250,
+            submitFormat: 'd.m.Y',
+            name: 'shippingDate',
+            minValue: new Date(),
+            listeners: {
+                select: function (el, value, eOpts) {
+                    me.fireEvent('addShippingDate', value);
+
+                }
+            }
+        });
+
+
+
         return Ext.create('Ext.container.Container', {
-            layout: 'hbox',
+            layout: 'vbox',
             flex: 3,
             width: '50%',
             title: 'left',
             padding: '10 0 0 10',
             autoHeight: true,
             items: [
-                shippingArt
+                shippingArt,
+                shippingDate
             ]
         });
     },

@@ -8,6 +8,7 @@
 
 namespace SwagBackendOrder\Components\Order\Hydrator;
 
+use DateTime;
 use SwagBackendOrder\Components\Order\Struct\OrderStruct;
 
 class OrderHydrator
@@ -72,7 +73,9 @@ class OrderHydrator
         $orderStruct->setShippingCostsNet((float) $data['shippingCostsNet']);
         $orderStruct->setShippingCosts((float) $data['shippingCosts']);
         $orderStruct->setShippingCostsTaxRate((float) $data['shippingCostsTaxRate']);
-
+        if (!empty($data['shippingDate'])) {
+            $orderStruct->setShippingDate(new DateTime($data['shippingDate']));
+        }
         $orderStruct->setAttributes($data['orderAttribute'][0]);
 
         foreach ($data['position'] as $position) {

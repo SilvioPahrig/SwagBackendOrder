@@ -234,6 +234,7 @@ class OrderFactory
     {
         $attributeData = $orderStruct->getAttributes();
 
+        /** @var OrderAttributes **/
         $attributes = new OrderAttributes();
         $attributes->setAttribute1($attributeData['attribute1']);
         $attributes->setAttribute2($attributeData['attribute2']);
@@ -241,6 +242,8 @@ class OrderFactory
         $attributes->setAttribute4($attributeData['attribute4']);
         $attributes->setAttribute5($attributeData['attribute5']);
         $attributes->setAttribute6($attributeData['attribute6']);
+
+        $attributes->setJaeDesiredDeliveryDate($orderStruct->getShippingDate());
 
         return $attributes;
     }

@@ -8,6 +8,8 @@
 
 namespace SwagBackendOrder\Components\Order\Struct;
 
+use DateTime;
+
 class OrderStruct
 {
     /**
@@ -44,6 +46,11 @@ class OrderStruct
      * @var float
      */
     private $shippingCostsTaxRate;
+
+    /**
+     * @var DateTime
+     */
+    private $shippingDate;
 
     /**
      * @var int
@@ -213,6 +220,22 @@ class OrderStruct
     public function setShippingCostsTaxRate($shippingCostsTaxRate)
     {
         $this->shippingCostsTaxRate = $shippingCostsTaxRate;
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getShippingDate(): ?DateTime
+    {
+        return $this->shippingDate;
+    }
+
+    /**
+     * @param DateTime $shippingDate
+     */
+    public function setShippingDate(DateTime $shippingDate): void
+    {
+        $this->shippingDate = $shippingDate;
     }
 
     /**

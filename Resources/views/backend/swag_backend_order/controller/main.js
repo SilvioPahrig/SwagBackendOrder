@@ -111,7 +111,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
                 createOrder: me.onCreateOrder
             },
             'createbackendorder-shippingcosts': {
-                addShippingCosts: me.onAddShippingCosts
+                addShippingCosts: me.onAddShippingCosts,
+                addShippingDate: me.addShippingDate
             },
             'createbackendorder-position-grid': {
                 openArticle: me.onOpenArticle,
@@ -455,6 +456,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
         me.totalCostsModel.set('shippingCosts', shippingCosts);
 
         me.onCalculateBasket();
+    },
+
+    addShippingDate: function (shippingDate) {
+        var me = this;
+        me.orderModel.set('shippingDate', shippingDate);
     },
 
     /**
