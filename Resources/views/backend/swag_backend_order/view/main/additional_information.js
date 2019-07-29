@@ -177,6 +177,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.AdditionalInformation', {
             }
         });
 
+        me.subApplication.getStore('DesktopTypes').on('datachanged', function(store, records, options){
+            desktopType.select(store.getAt(0));
+        });
+
         return Ext.create('Ext.container.Container', {
             layout: 'hbox',
             flex: 9,
