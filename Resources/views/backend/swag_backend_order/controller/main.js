@@ -296,16 +296,14 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
             }
         }
 
-        if( me.additionaShippingModel.get('billingAsShippingCheckBox') === 'other') {
+        if( me.additionaShippingModel.get('billingAsShippingType') === 'other') {
             if (me.additionaShippingModel.get('salutation') === '' ||
                 me.additionaShippingModel.get('firstname') === '' ||
                 me.additionaShippingModel.get('lastName') === '' ||
                 me.additionaShippingModel.get('street') === '' ||
                 me.additionaShippingModel.get('zipcode') === '' ||
                 me.additionaShippingModel.get('city') === '' ||
-                me.additionaShippingModel.get('country') === '' ||
-                me.additionaShippingModel.get('additionalAddressLine1') === '' ||
-                me.additionaShippingModel.get('company') === ''
+                me.additionaShippingModel.get('country') === ''
             ) {
                 errmsg += me.snippets.error.billingAsShipping + '<br>';
             }
@@ -802,9 +800,10 @@ Ext.define('Shopware.apps.SwagBackendOrder.controller.Main', {
     /**
      * deselects the shipping address
      */
-    onSelectBillingAsShippingAddress: function () {
+    onSelectBillingAsShippingAddress: function (value) {
         var me = this;
         me.orderModel.set('shippingAddressId', null);
+        me.additionaShippingModel.set('billingAsShippingType', value)
     },
 
     /**

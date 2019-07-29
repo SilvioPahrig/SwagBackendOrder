@@ -191,11 +191,11 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
             }
         });
 
-        me.billingAsShippingCheckbox = Ext.create('Ext.form.field.ComboBox', {
+        me.billingAsShippingType = Ext.create('Ext.form.field.ComboBox', {
             flex: 1,
             boxLabel: me.snippets.billingAsShipping,
             name: 'billingAsShipping',
-            id: 'billingAsShippingCheckBox',
+            id: 'billingAsShippingType',
             valueField: 'value',
             displayField: 'label',
             store: new Ext.data.Store({
@@ -212,9 +212,9 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
             }
         });
 
-        me.billingAsShippingCheckbox.select('billing');
+        me.billingAsShippingType.select('billing');
 
-        return [me.billingAsShippingCheckbox, me.shippingAddressComboBox];
+        return [me.billingAsShippingType, me.shippingAddressComboBox];
     },
 
     getAddressFieldsColumn1: function () {
@@ -232,7 +232,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
                 store: Ext.create('Shopware.apps.Base.store.Salutation').load(),
                 listeners: {
                     select: function (el, record) {
-                        me.fireEvent('changeAdditionalBilling', el, record[0].data.id);
+                        me.fireEvent('changeAdditionalShipping', el, record[0].data.id);
                     },
                     scope: me
                 }
@@ -279,8 +279,8 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
                 fieldLabel: me.snippets.fields.country,
                 pageSize: 25,
                 listeners: {
-                    select: function (el, record) {
-                        me.fireEvent('changeAdditionalBilling', el, record[0].data.id);
+                    change: function (el, record) {
+                        me.fireEvent('changeAdditionalShipping', el, record);
                     },
                     scope: me
                 },
@@ -307,7 +307,7 @@ Ext.define('Shopware.apps.SwagBackendOrder.view.main.CustomerInformation.Shippin
     onSelectBillingAsShipping: function (field, selectRecords) {
         var value = selectRecords[0].getData().value,
             me = this;
-        me.fireEvent('selectBillingAsShippingAddress');
+        me.fireEvent('selectBillingAsShippingAddress', value);
 
         if (value === 'billing') {
             me.disableShippingAddressComboBox();

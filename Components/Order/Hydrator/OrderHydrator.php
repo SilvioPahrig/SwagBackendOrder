@@ -38,11 +38,21 @@ class OrderHydrator
         $orderStruct = new OrderStruct();
 
         $orderStruct->setCustomerId((int) $data['customerId']);
-        $orderStruct->setBillingAddressId((int) $data['billingAddressId']);
 
-        $orderStruct->setShippingAddressId($data['billingAddressId']);
-        if ($data['shippingAddressId']) {
+
+        $orderStruct->setBillingAddressId((int) $data['billingAddressId']);
+        if ($data['additionalBillingAddress'][0]['newBillingAddressValues']) {
+            $orderStruct->setAdditionalBillingAddressData($data['additionalBillingAddress'][0]);
+        }
+
+        if ($data['additionalShippingAddress'][0]['billingAsShippingType'] === 'shipping' &&
+            $data['shippingAddressId']
+        ) {
             $orderStruct->setShippingAddressId($data['shippingAddressId']);
+        } elseif ($data['additionalShippingAddress'][0]['billingAsShippingType'] === 'other') {
+            $orderStruct->setAdditionalShippingAddressData($data['additionalShippingAddress'][0]);
+        } else {
+            $orderStruct->setShippingAddressId($data['billingAddressId']);
         }
 
         $orderStruct->setPaymentId((int) $data['paymentId']);

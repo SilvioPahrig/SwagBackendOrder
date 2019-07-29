@@ -11,6 +11,7 @@ namespace SwagBackendOrder\Components\Order\Factory;
 use Shopware\Bundle\AccountBundle\Service\AddressServiceInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Attribute\Order as OrderAttributes;
+use Shopware\Models\Country\Country;
 use Shopware\Models\Customer\Address;
 use Shopware\Models\Customer\Customer;
 use Shopware\Models\Customer\PaymentData;
@@ -252,12 +253,32 @@ class OrderFactory
      */
     private function createShippingAddress(OrderStruct $orderStruct, $customer)
     {
-        $shippingAddress = $this->modelManager->find(Address::class, $orderStruct->getShippingAddressId());
         $shipping = new Shipping();
-        $shipping->fromAddress($shippingAddress);
+        if ($orderStruct->hasAdditionalShippingAddressData()) {
+            $shipping->setSalutation($orderStruct->getAdditionalShippingAddressData()->getSalutation());
+            $shipping->setFirstName($orderStruct->getAdditionalShippingAddressData()->getFirstName());
+            $shipping->setLastName($orderStruct->getAdditionalShippingAddressData()->getLastName());
+            $shipping->setStreet($orderStruct->getAdditionalShippingAddressData()->getStreet());
+            $shipping->setZipCode($orderStruct->getAdditionalShippingAddressData()->getZipcode());
+            $shipping->setCity($orderStruct->getAdditionalShippingAddressData()->getCity());
+            $shipping->setCountry($this->getCountry($orderStruct->getAdditionalShippingAddressData()->getCountryId()));
+            $shipping->setAdditionalAddressLine1(
+                $orderStruct->getAdditionalShippingAddressData()->getAdditionalAddressLine1()
+            );
+            $shipping->setCompany($orderStruct->getAdditionalShippingAddressData()->getCompany());
+        } else {
+            $shippingAddress = $this->modelManager->find(Address::class, $orderStruct->getShippingAddressId());
+            $shipping->fromAddress($shippingAddress);
+        }
         $shipping->setCustomer($customer);
 
         return $shipping;
+    }
+
+    private function getCountry(int $countryId)
+    {
+        $country = $this->modelManager->find(Country::class, $countryId);
+        return $country;
     }
 
     /**
@@ -268,9 +289,16 @@ class OrderFactory
      */
     private function createBillingAddress(OrderStruct $orderStruct, $customer)
     {
+        /** @var Customer $billingAddress */
         $billingAddress = $this->modelManager->find(Address::class, $orderStruct->getBillingAddressId());
         $billing = new Billing();
         $billing->fromAddress($billingAddress);
+        if ($orderStruct->hasAdditionalBillingAddressData()) {
+            $billing->setFirstname($orderStruct->getAdditionalBillingAddressData()->getFirstName());
+            $billing->setLastname($orderStruct->getAdditionalBillingAddressData()->getLastName());
+            $billing->setSalutation($orderStruct->getAdditionalBillingAddressData()->getSalutation());
+
+        }
         $billing->setCustomer($customer);
 
         return $billing;

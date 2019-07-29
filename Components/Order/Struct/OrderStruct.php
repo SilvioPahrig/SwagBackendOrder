@@ -111,6 +111,15 @@ class OrderStruct
     private $attributes;
 
     /**
+     * @var AdditionalBillingAddressStruct
+     */
+    private $additionalBillingAddressData;
+
+    /**
+     * @var AdditionalShippingAddressStuct
+     */
+    private $additionalShippingAddressData;
+    /**
      * @return int
      */
     public function getCustomerId()
@@ -437,4 +446,49 @@ class OrderStruct
     {
         $this->attributes = $attributes;
     }
+
+    /**
+     * @return AdditionalBillingAddressStruct
+     */
+    public function getAdditionalBillingAddressData(): ?AdditionalBillingAddressStruct
+    {
+        return $this->additionalBillingAddressData;
+    }
+
+    /**
+     * @param array $additionalBillingAddressData
+     */
+    public function setAdditionalBillingAddressData(array $additionalBillingAddressData): void
+    {
+        $this->additionalBillingAddressData = new AdditionalBillingAddressStruct();
+        $this->additionalBillingAddressData->fromArray($additionalBillingAddressData);
+    }
+
+    public function hasAdditionalBillingAddressData():bool
+    {
+        return $this->additionalBillingAddressData !== null;
+    }
+
+    /**
+     * @return AdditionalShippingAddressStuct
+     */
+    public function getAdditionalShippingAddressData(): ?AdditionalShippingAddressStuct
+    {
+        return $this->additionalShippingAddressData;
+    }
+
+    /**
+     * @param array $additionalShippingAddressData
+     */
+    public function setAdditionalShippingAddressData(array $additionalShippingAddressData): void
+    {
+        $this->additionalShippingAddressData = new AdditionalShippingAddressStuct();
+        $this->additionalShippingAddressData->fromArray($additionalShippingAddressData);
+    }
+
+    public function hasAdditionalShippingAddressData(): bool
+    {
+        return $this->additionalShippingAddressData !== null;
+    }
+
 }
